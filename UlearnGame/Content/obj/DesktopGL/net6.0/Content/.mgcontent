@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Profile>Reach</Profile>
+  <Platform>DesktopGL</Platform>
+  <Config />
+  <SourceFiles>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/backroad.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/Bullet.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/Button.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/DamageSound.mp3</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/Explosion.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/Font.spritefont</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/Game.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/MainMenu.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/monster11.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/monster2.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/monster3.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/pixil-frame-0.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/Player.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/scoreBack.png</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/ShootSound.mp3</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/ShootSoundPlayer2.mp3</File>
+    <File>C:/Users/1/Desktop/UlearnGame-2/UlearnGame/Content/soundMainMenu.mp3</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>
