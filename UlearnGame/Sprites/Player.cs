@@ -33,7 +33,7 @@ namespace UlearnGame.Sprites
 
         public Player(Texture2D texture) : base(texture)
         {
-            Speed = 3f; //скорость игрока
+            Speed = 4f; //скорость игрока
         }
 
         private float _shootTimer = 0;
@@ -59,7 +59,10 @@ namespace UlearnGame.Sprites
             _previousKey = _currentKey;
             _currentKey = Keyboard.GetState();
 
+            // Обнуляем направление движения перед обработкой клавиш
             var velocity = Vector2.Zero;
+
+            // Сбрасываем поворот игрока перед новым кадром
             _rotation = 0;
 
             //задаём движение игрока
@@ -94,7 +97,11 @@ namespace UlearnGame.Sprites
 
             Position += velocity;
 
-            Position = Vector2.Clamp(Position, new Vector2(80, 0), new Vector2(Game1.ScreenWidth / 4, Game1.ScreenHeight));                         
+            Position = Vector2.Clamp(
+                Position,
+                new Vector2(80, 40),
+                new Vector2(Game1.ScreenWidth / 4, Game1.ScreenHeight - 40)
+);                         
             
         }
 
