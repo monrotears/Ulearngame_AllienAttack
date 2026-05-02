@@ -54,6 +54,7 @@ namespace UlearnGame
                       Position = new Vector2(Game1.ScreenWidth / 2, 400),
                       Click = new EventHandler(Button_1Player_Clicked),
                       Layer = 0.1f,
+                      Scale = 1.15f,
                  },
 
                  new Button(buttonTexture, buttonFont)
@@ -61,7 +62,8 @@ namespace UlearnGame
                       Text = "2 Игрока",
                       Position = new Vector2(Game1.ScreenWidth / 2, 440),
                       Click = new EventHandler(Button_2Player_Clicked),
-                      Layer = 0.1f
+                      Layer = 0.1f,
+                      Scale = 1.15f,
                  },
 
                   new Button(buttonTexture, buttonFont)
@@ -69,7 +71,8 @@ namespace UlearnGame
                       Text = "Рекорды",
                       Position = new Vector2(Game1.ScreenWidth / 2, 480),
                       Click = new EventHandler(Button_Highscores_Clicked),
-                      Layer = 0.1f
+                      Layer = 0.1f,
+                      Scale = 1.15f,
                   },
 
                   new Button(buttonTexture, buttonFont)
@@ -77,7 +80,8 @@ namespace UlearnGame
                       Text = "Выйти из игры",
                       Position = new Vector2(Game1.ScreenWidth / 2, 520),
                       Click = new EventHandler(Button_Quit_Clicked),
-                      Layer = 0.1f
+                      Layer = 0.1f,
+                      Scale = 1.15f,
                   },
 
             };

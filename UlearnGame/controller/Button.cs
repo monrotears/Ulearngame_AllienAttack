@@ -42,14 +42,24 @@ namespace UlearnGame.Controller
         }
 
         public Color PenColour { get; set; }
-
+        
+        public float Scale { get; set; } = 1f;
+        
         public Vector2 Position { get; set; }
 
         public Rectangle Rectangle
         {
             get
             {
-                return new Rectangle((int)Position.X - ((int)Origin.X), (int)Position.Y - (int)Origin.Y, _texture.Width, _texture.Height);
+                var width = (int)(_texture.Width * Scale);
+                var height = (int)(_texture.Height * Scale);
+
+                return new Rectangle(
+                    (int)Position.X - width / 2,
+                    (int)Position.Y - height / 2,
+                    width,
+                    height
+                );
             }
         }
 
@@ -73,9 +83,9 @@ namespace UlearnGame.Controller
             var colour = Color.White;
 
             if (_isHovering) // цвет кнопки в главном меню при наведении курсором
-                colour = Color.Red;
+                colour = Color.LightSkyBlue;
 
-            spriteBatch.Draw(_texture, Position, null, colour, 0f, Origin, 1f, SpriteEffects.None, Layer);
+            spriteBatch.Draw(_texture, Position, null, colour, 0f, Origin, Scale, SpriteEffects.None, Layer);
 
             if (!string.IsNullOrEmpty(Text))
             {
