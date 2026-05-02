@@ -38,15 +38,11 @@ namespace UlearnGame
             base.Initialize();
         }
 
-        protected override void LoadContent()
+        protected override void LoadContent()//активировал меню
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Prototype build: сразу запускаем игровое поле без меню.
-            _currentState = new GameState(this, Content)
-            {
-                PlayerCount = 1,
-            };
+            _currentState = new MenuState(this, Content);
             _currentState.LoadContent();
             _nextState = null;
         }
