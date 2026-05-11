@@ -15,12 +15,11 @@ namespace UlearnGame
 {
     public class MenuState : State // окно главного меню
     {
+        private const float MainMenuVolume = 0.1f;
 
         private List<Component> _components;
 
         
-
-        //Song songMainMenu;
 
         public MenuState(Game1 game, ContentManager content) : base(game, content)
         {
@@ -31,13 +30,8 @@ namespace UlearnGame
         {
             var buttonTexture = _content.Load<Texture2D>("Button");
             var buttonFont = _content.Load<SpriteFont>("Font");
-            var songMainMenu = _content.Load<Song>("soundMainMenu");
 
-            MediaPlayer.Play(songMainMenu);
-            MediaPlayer.Volume = 0.1f;
-            MediaPlayer.IsRepeating = true;
-
-
+            PlayMainMenuMusic();
 
             _components = new List<Component>()
             {
@@ -85,6 +79,18 @@ namespace UlearnGame
                   },
 
             };
+        }
+
+        private void PlayMainMenuMusic()
+        {
+            MediaPlayer.Volume = MainMenuVolume;
+            MediaPlayer.IsRepeating = true;
+
+            if (MediaPlayer.State == MediaState.Playing)
+                return;
+
+            var songMainMenu = _content.Load<Song>("soundMainMenu");
+            MediaPlayer.Play(songMainMenu);
         }
 
         private void Button_1Player_Clicked(object sender, EventArgs args)
