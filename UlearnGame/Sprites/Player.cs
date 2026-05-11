@@ -93,7 +93,7 @@ namespace UlearnGame.Sprites
             if (_currentKey.IsKeyDown(Input.Shoot) && _shootTimer > 0.25f)
             {
                 Shoot(Speed * 2);
-                ShootSound?.Play();
+                ShootSound?.Play(AudioSettings.CurrentGameVolume, 0f, 0f);
                 _shootTimer = 0f;
             }
 

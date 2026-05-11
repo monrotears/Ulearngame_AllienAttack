@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using UlearnGame.Controller;
+using UlearnGame.Models;
 using UlearnGame.Sprites;
 using UlearnGame.States;
 
@@ -15,8 +16,6 @@ namespace UlearnGame
 {
     public class MenuState : State // окно главного меню
     {
-        private const float MainMenuVolume = 0.1f;
-
         private List<Component> _components;
 
         
@@ -83,7 +82,7 @@ namespace UlearnGame
 
         private void PlayMainMenuMusic()
         {
-            MediaPlayer.Volume = MainMenuVolume;
+            AudioSettings.ApplyMenuVolume();
             MediaPlayer.IsRepeating = true;
 
             if (MediaPlayer.State == MediaState.Playing)

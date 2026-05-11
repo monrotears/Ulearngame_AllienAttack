@@ -6,15 +6,22 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using UlearnGame.Controller;
+using UlearnGame.Models;
 using UlearnGame.Sprites;
 
 namespace UlearnGame.States
 {
     public class GameState : State
     {
+        private Texture2D _blankTexture;
+        private Button _muteButton;
+        private Button _settingsButton;
+        private List<Component> _settingsComponents;
         private List<Sprite> _sprites;
         private List<Player> _players;
         private SpriteFont _font;
+        private bool _settingsOpen;
 
         public int PlayerCount;
 
@@ -31,11 +38,16 @@ namespace UlearnGame.States
             var playerTexture = _content.Load<Texture2D>("Player");
             var secondPlayerTexture = _content.Load<Texture2D>("pixil-frame-0");
             var bulletTexture = _content.Load<Texture2D>("Bullet");
+            var buttonTexture = _content.Load<Texture2D>("Button");
             var shootSound = _content.Load<SoundEffect>("ShootSound");
             var secondPlayerShootSound = _content.Load<SoundEffect>("ShootSoundPlayer2");
             _font = _content.Load<SpriteFont>("Font");
 
+            _blankTexture = new Texture2D(_game.GraphicsDevice, 1, 1);
+            _blankTexture.SetData(new[] { Color.White });
+
             var playerBullet = new Bullet(bulletTexture);
+            CreateSettingsComponents(buttonTexture);
 
             _sprites = new List<Sprite>()
             {
@@ -54,6 +66,71 @@ namespace UlearnGame.States
             }
 
             _players = _sprites.Where(sprite => sprite is Player).Select(sprite => (Player)sprite).ToList();
+        }
+
+        private void CreateSettingsComponents(Texture2D buttonTexture)
+        {
+            _settingsButton = new Button(buttonTexture, _font)
+            {
+                Text = "Настройки",
+                Position = new Vector2(Game1.ScreenWidth - 130, 40),
+                Click = new System.EventHandler(SettingsButton_Clicked),
+                Layer = 0.9f,
+                Scale = 1.1f,
+            };
+
+            _muteButton = new Button(buttonTexture, _font)
+            {
+                Position = new Vector2(Game1.ScreenWidth / 2, 440),
+                Click = new System.EventHandler(MuteButton_Clicked),
+                Layer = 0.9f,
+                Scale = 1.15f,
+            };
+
+            UpdateMuteButtonText();
+
+            _settingsComponents = new List<Component>()
+            {
+                new Slider(_blankTexture, _font)
+                {
+                    Text = "Музыка меню",
+                    Position = new Vector2(500, 250),
+                    Value = AudioSettings.MenuVolume,
+                    ValueChanged = value =>
+                    {
+                        AudioSettings.MenuVolume = value;
+                        AudioSettings.ApplyMenuVolume();
+                    },
+                },
+                new Slider(_blankTexture, _font)
+                {
+                    Text = "Звуки игры",
+                    Position = new Vector2(500, 335),
+                    Value = AudioSettings.GameVolume,
+                    ValueChanged = value => AudioSettings.GameVolume = value,
+                },
+                _muteButton,
+            };
+        }
+
+        private void SettingsButton_Clicked(object sender, System.EventArgs args)
+        {
+            _settingsOpen = !_settingsOpen;
+        }
+
+        private void MuteButton_Clicked(object sender, System.EventArgs args)
+        {
+            AudioSettings.IsMuted = !AudioSettings.IsMuted;
+            AudioSettings.ApplyMenuVolume();
+            UpdateMuteButtonText();
+        }
+
+        private void UpdateMuteButtonText()
+        {
+            if (_muteButton == null)
+                return;
+
+            _muteButton.Text = AudioSettings.IsMuted ? "Включить звук" : "Выключить звук";
         }
 
         private Player CreatePlayer(
@@ -98,6 +175,16 @@ namespace UlearnGame.States
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 _game.Exit();
 
+            _settingsButton.Update(gameTime);
+
+            if (_settingsOpen)
+            {
+                foreach (var component in _settingsComponents)
+                    component.Update(gameTime);
+
+                return;
+            }
+
             foreach (var sprite in _sprites)
                 sprite.Update(gameTime);
 
@@ -135,14 +222,31 @@ namespace UlearnGame.States
             foreach (var sprite in _sprites)
                 sprite.Draw(gameTime, spriteBatch);
 
+            _settingsButton.Draw(gameTime, spriteBatch);
+
             spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.DrawString(_font, "Prototype build: movement only", new Vector2(40, 10), Color.Red);
+            spriteBatch.DrawString(_font, "Prototype build", new Vector2(40, 10), Color.Red);
             spriteBatch.DrawString(_font, "WASD - движение игрока 1, Space - выстрел, Esc - выход", new Vector2(40, 35), Color.Red);
 
             if (PlayerCount >= 2)
                 spriteBatch.DrawString(_font, "Стрелки - движение игрока 2, Right Ctrl - выстрел", new Vector2(40, 60), Color.Red);
+
+            spriteBatch.End();
+
+            if (_settingsOpen)
+                DrawSettings(spriteBatch);
+        }
+
+        private void DrawSettings(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Begin();
+            spriteBatch.Draw(_blankTexture, new Rectangle(420, 180, 440, 320), Color.Black * 0.8f);
+            spriteBatch.DrawString(_font, "Настройки звука", new Vector2(500, 205), Color.White);
+
+            foreach (var component in _settingsComponents)
+                component.Draw(null, spriteBatch);
 
             spriteBatch.End();
         }
