@@ -28,6 +28,7 @@ namespace UlearnGame.States
 
             var backgroundTexture = _content.Load<Texture2D>("backroad");
             var playerTexture = _content.Load<Texture2D>("Player");
+            var secondPlayerTexture = _content.Load<Texture2D>("pixil-frame-0");
             _font = _content.Load<SpriteFont>("Font");
 
             _sprites = new List<Sprite>()
@@ -43,7 +44,7 @@ namespace UlearnGame.States
 
             if (PlayerCount >= 2)
             {
-                _sprites.Add(CreatePlayer(playerTexture, Color.LightBlue, new Vector2(100, 350), "Игрок 2", Keys.Up, Keys.Down, Keys.Left, Keys.Right));
+                _sprites.Add(CreatePlayer(secondPlayerTexture, Color.White, new Vector2(100, 350), "Игрок 2", Keys.Up, Keys.Down, Keys.Left, Keys.Right));
             }
 
             _players = _sprites.Where(sprite => sprite is Player).Select(sprite => (Player)sprite).ToList();
