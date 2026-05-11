@@ -49,6 +49,8 @@ namespace UlearnGame.Sprites
         public Input Input { get; set; }
 
         public Score Score { get; set; }
+
+        public SoundEffect ShootSound { get; set; }
         
 
         public override void Update(GameTime gameTime)
@@ -89,10 +91,10 @@ namespace UlearnGame.Sprites
             _shootTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (_currentKey.IsKeyDown(Input.Shoot) && _shootTimer > 0.25f)
-            {              
-               Shoot(Speed * 2);
-               _shootTimer = 0f;              
-
+            {
+                Shoot(Speed * 2);
+                ShootSound?.Play();
+                _shootTimer = 0f;
             }
 
             Position += velocity;
