@@ -78,10 +78,12 @@ namespace UlearnGame
                       Scale = 1.15f,
                   },
 
+                  _settingsButton,
+
                   new Button(buttonTexture, _font)
                   {
                       Text = "Выйти из игры",
-                      Position = new Vector2(Game1.ScreenWidth / 2, 520),
+                      Position = new Vector2(Game1.ScreenWidth / 2, 560),
                       Click = new EventHandler(Button_Quit_Clicked),
                       Layer = 0.1f,
                       Scale = 1.15f,
@@ -107,10 +109,10 @@ namespace UlearnGame
             _settingsButton = new Button(buttonTexture, _font)
             {
                 Text = "Настройки",
-                Position = new Vector2(Game1.ScreenWidth - 130, 40),
+                Position = new Vector2(Game1.ScreenWidth / 2, 520),
                 Click = new EventHandler(SettingsButton_Clicked),
                 Layer = 0.1f,
-                Scale = 1.1f,
+                Scale = 1.15f,
             };
 
             _muteButton = new Button(buttonTexture, _font)
@@ -195,10 +197,10 @@ namespace UlearnGame
 
         public override void Update(GameTime gameTime)
         {
-            _settingsButton.Update(gameTime);
-
             if (_settingsOpen)
             {
+                _settingsButton.Update(gameTime);
+
                 foreach (var component in _settingsComponents)
                     component.Update(gameTime);
 
@@ -219,8 +221,6 @@ namespace UlearnGame
 
             foreach (var component in _components)
                 component.Draw(gameTime, spriteBatch);
-
-            _settingsButton.Draw(gameTime, spriteBatch);
 
             spriteBatch.End();
 
