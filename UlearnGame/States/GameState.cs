@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -22,8 +23,12 @@ namespace UlearnGame.States
         private List<Sprite> _sprites;
         private List<Player> _players;
         private EnemyManager _enemyManager;
+        private ScoreManager _scoreManager;
         private SpriteFont _font;
+        private bool _gameOver;
         private bool _settingsOpen;
+        private bool _scoresSaved;
+        private float _survivalTime;
 
         public int PlayerCount;
 
@@ -62,6 +67,7 @@ namespace UlearnGame.States
                 Explosion = explosion,
             };
             CreateSettingsComponents(buttonTexture);
+            _settingsButton.Text = "Настройки";
 
             _sprites = new List<Sprite>()
             {
@@ -80,10 +86,17 @@ namespace UlearnGame.States
             }
 
             _players = _sprites.Where(sprite => sprite is Player).Select(sprite => (Player)sprite).ToList();
+            for (int i = 0; i < _players.Count; i++)
+                _players[i].Score.PlayerName = $"Игрок {i + 1}";
+
             _enemyManager = new EnemyManager(_content)
             {
                 Bullet = enemyBullet,
             };
+            _scoreManager = ScoreManager.Load();
+            _gameOver = false;
+            _scoresSaved = false;
+            _survivalTime = 0f;
         }
 
         private void CreateSettingsComponents(Texture2D buttonTexture)
@@ -195,6 +208,18 @@ namespace UlearnGame.States
 
             _settingsButton.Update(gameTime);
 
+            if (_gameOver)
+            {
+                var keyboard = Keyboard.GetState();
+
+                if (keyboard.IsKeyDown(Keys.Enter))
+                    _game.ChangeState(new HighscoresState(_game, _content));
+                else if (keyboard.IsKeyDown(Keys.R))
+                    _game.ChangeState(new GameState(_game, _content) { PlayerCount = PlayerCount });
+
+                return;
+            }
+
             if (_settingsOpen)
             {
                 foreach (var component in _settingsComponents)
@@ -202,6 +227,8 @@ namespace UlearnGame.States
 
                 return;
             }
+
+            _survivalTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             foreach (var sprite in _sprites)
                 sprite.Update(gameTime);
@@ -214,6 +241,9 @@ namespace UlearnGame.States
             AddChildSprites();
 
             RemoveOldSprites();
+
+            if (_players.All(player => player.IsDead))
+                EndGame();
         }
 
         private void RemoveOldSprites()
@@ -238,11 +268,31 @@ namespace UlearnGame.States
             _sprites.AddRange(children);
         }
 
+        private void EndGame()
+        {
+            _gameOver = true;
+
+            if (_scoresSaved)
+                return;
+
+            foreach (var player in _players)
+                _scoreManager.Add(player.Score);
+
+            ScoreManager.Save(_scoreManager);
+            _scoresSaved = true;
+        }
+
         public override void PostUpdate(GameTime gameTime)
         {
+            if (_settingsOpen || _gameOver)
+                return;
+
             CheckCollisions();
             AddChildSprites();
             RemoveOldSprites();
+
+            if (_players.All(player => player.IsDead))
+                EndGame();
         }
 
         private void CheckCollisions()
@@ -288,10 +338,52 @@ namespace UlearnGame.States
             if (PlayerCount >= 2)
                 spriteBatch.DrawString(_font, "Стрелки - движение игрока 2, Right Ctrl - выстрел", new Vector2(40, 60), Color.Red);
 
+            DrawHud(spriteBatch);
+
+            if (_gameOver)
+                DrawGameOver(spriteBatch);
+
             spriteBatch.End();
 
             if (_settingsOpen)
                 DrawSettings(spriteBatch);
+        }
+
+        private void DrawHud(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(_blankTexture, new Rectangle(25, 8, 610, PlayerCount >= 2 ? 128 : 104), Color.Black * 0.65f);
+            spriteBatch.DrawString(_font, "Управление", new Vector2(40, 15), Color.White);
+            spriteBatch.DrawString(_font, "Игрок 1: WASD - движение, Space - стрельба", new Vector2(40, 40), Color.White);
+
+            if (PlayerCount >= 2)
+                spriteBatch.DrawString(_font, "Игрок 2: стрелки - движение, Right Ctrl - стрельба", new Vector2(40, 65), Color.White);
+
+            var scoreY = PlayerCount >= 2 ? 92 : 67;
+            spriteBatch.DrawString(_font, $"Счет: {GetTotalScore()}    Время: {(int)_survivalTime} сек.", new Vector2(40, scoreY), Color.Yellow);
+
+            var healthText = string.Join("    ", _players.Select(player => $"{player.Score.PlayerName}: {player.Score.Value} очков, HP {Math.Max(0, player.Health)}"));
+            spriteBatch.DrawString(_font, healthText, new Vector2(40, scoreY + 25), Color.LightGreen);
+        }
+
+        private int GetTotalScore()
+        {
+            return _players.Sum(player => player.Score.Value);
+        }
+
+        private void DrawGameOver(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(_blankTexture, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.Black * 0.55f);
+            spriteBatch.Draw(_blankTexture, new Rectangle(390, 210, 500, 255), Color.Black * 0.85f);
+            spriteBatch.DrawString(_font, "Игра окончена", new Vector2(520, 235), Color.White);
+            spriteBatch.DrawString(_font, $"Итоговый счет: {GetTotalScore()}", new Vector2(500, 285), Color.Yellow);
+
+            for (int i = 0; i < _players.Count; i++)
+            {
+                var player = _players[i];
+                spriteBatch.DrawString(_font, $"{player.Score.PlayerName}: {player.Score.Value}", new Vector2(520, 325 + i * 30), Color.LightGreen);
+            }
+
+            spriteBatch.DrawString(_font, "Enter - рекорды    R - заново    Esc - выход", new Vector2(430, 415), Color.White);
         }
 
         private void DrawSettings(SpriteBatch spriteBatch)
