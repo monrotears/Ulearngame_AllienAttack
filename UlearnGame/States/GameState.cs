@@ -26,6 +26,8 @@ namespace UlearnGame.States
         private ScoreManager _scoreManager;
         private SpriteFont _font;
         private bool _gameOver;
+        private bool _isPaused;
+        private KeyboardState _previousKeyboardState;
         private bool _settingsOpen;
         private bool _scoresSaved;
         private float _survivalTime;
@@ -95,6 +97,8 @@ namespace UlearnGame.States
             };
             _scoreManager = ScoreManager.Load();
             _gameOver = false;
+            _isPaused = false;
+            _previousKeyboardState = Keyboard.GetState();
             _scoresSaved = false;
             _survivalTime = 0f;
         }
@@ -203,15 +207,15 @@ namespace UlearnGame.States
 
         public override void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            var keyboard = Keyboard.GetState();
+
+            if (keyboard.IsKeyDown(Keys.Escape))
                 _game.Exit();
 
             _settingsButton.Update(gameTime);
 
             if (_gameOver)
             {
-                var keyboard = Keyboard.GetState();
-
                 if (keyboard.IsKeyDown(Keys.Enter))
                     _game.ChangeState(new HighscoresState(_game, _content));
                 else if (keyboard.IsKeyDown(Keys.R))
@@ -220,11 +224,21 @@ namespace UlearnGame.States
                 return;
             }
 
+            if (IsKeyPressed(keyboard, Keys.P))
+                _isPaused = !_isPaused;
+
             if (_settingsOpen)
             {
                 foreach (var component in _settingsComponents)
                     component.Update(gameTime);
 
+                _previousKeyboardState = keyboard;
+                return;
+            }
+
+            if (_isPaused)
+            {
+                _previousKeyboardState = keyboard;
                 return;
             }
 
@@ -244,6 +258,13 @@ namespace UlearnGame.States
 
             if (_players.All(player => player.IsDead))
                 EndGame();
+
+            _previousKeyboardState = keyboard;
+        }
+
+        private bool IsKeyPressed(KeyboardState keyboard, Keys key)
+        {
+            return keyboard.IsKeyDown(key) && !_previousKeyboardState.IsKeyDown(key);
         }
 
         private void RemoveOldSprites()
@@ -284,7 +305,7 @@ namespace UlearnGame.States
 
         public override void PostUpdate(GameTime gameTime)
         {
-            if (_settingsOpen || _gameOver)
+            if (_settingsOpen || _gameOver || _isPaused)
                 return;
 
             CheckCollisions();
@@ -334,6 +355,9 @@ namespace UlearnGame.States
             spriteBatch.Begin();
             DrawHud(spriteBatch);
 
+            if (_isPaused)
+                DrawPause(spriteBatch);
+
             if (_gameOver)
                 DrawGameOver(spriteBatch);
 
@@ -345,9 +369,9 @@ namespace UlearnGame.States
 
         private void DrawHud(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_blankTexture, new Rectangle(25, 8, 610, PlayerCount >= 2 ? 128 : 104), Color.Black * 0.65f);
+            spriteBatch.Draw(_blankTexture, new Rectangle(25, 8, 735, PlayerCount >= 2 ? 128 : 104), Color.Black * 0.65f);
             spriteBatch.DrawString(_font, "Управление", new Vector2(40, 15), Color.White);
-            spriteBatch.DrawString(_font, "Игрок 1: WASD - движение, Space - стрельба", new Vector2(40, 40), Color.White);
+            spriteBatch.DrawString(_font, "Игрок 1: WASD - движение, Space - стрельба, P - пауза", new Vector2(40, 40), Color.White);
 
             if (PlayerCount >= 2)
                 spriteBatch.DrawString(_font, "Игрок 2: стрелки - движение, Enter - стрельба", new Vector2(40, 65), Color.White);
@@ -362,6 +386,14 @@ namespace UlearnGame.States
         private int GetTotalScore()
         {
             return _players.Sum(player => player.Score.Value);
+        }
+
+        private void DrawPause(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(_blankTexture, new Rectangle(0, 0, Game1.ScreenWidth, Game1.ScreenHeight), Color.Black * 0.45f);
+            spriteBatch.Draw(_blankTexture, new Rectangle(440, 265, 400, 150), Color.Black * 0.85f);
+            spriteBatch.DrawString(_font, "Пауза", new Vector2(595, 295), Color.White);
+            spriteBatch.DrawString(_font, "P - продолжить    Esc - выход", new Vector2(480, 350), Color.White);
         }
 
         private void DrawGameOver(SpriteBatch spriteBatch)
