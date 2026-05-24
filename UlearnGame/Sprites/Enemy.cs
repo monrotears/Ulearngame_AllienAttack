@@ -19,6 +19,8 @@ namespace UlearnGame.Sprites
 
         public float ShootingTimer = 1.75f; //период выстрелов
 
+        public List<Player> Targets { get; set; }
+
         public override void Update(GameTime gameTime)
         {
             _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -29,7 +31,25 @@ namespace UlearnGame.Sprites
                 _timer = 0;
             }
 
-            Position += new Vector2(-Speed, 0);
+            var target = Targets?
+                .Where(player => !player.IsDead)
+                .OrderBy(player => Vector2.DistanceSquared(Position, player.Position))
+                .FirstOrDefault();
+
+            if (target != null)
+            {
+                var direction = target.Position - Position;
+
+                if (direction != Vector2.Zero)
+                {
+                    direction.Normalize();
+                    Position += direction * Speed;
+                }
+            }
+            else
+            {
+                Position += new Vector2(-Speed, 0);
+            }
 
             //если враг находится за пределами левой части экрана
             if (Position.X < -_texture.Width)
@@ -41,9 +61,7 @@ namespace UlearnGame.Sprites
             //Если враг врежется в игрока, который все еще жив
             if (sprite is Player && !((Player)sprite).IsDead)
             {
-                ((Player)sprite).Score.Value++;
-
-                // полностью убрать 
+                ((Player)sprite).Health -= 3;
                 IsRemoved = true;
             }
                

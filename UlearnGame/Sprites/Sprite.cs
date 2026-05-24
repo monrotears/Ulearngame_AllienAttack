@@ -240,6 +240,7 @@ namespace UlearnGame.Sprites
         public object Clone()
         {
             var sprite = this.MemberwiseClone() as Sprite;
+            sprite.Children = new List<Sprite>();
 
             if (_animations != null)
             {

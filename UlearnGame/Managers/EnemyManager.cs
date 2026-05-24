@@ -103,7 +103,7 @@ namespace UlearnGame.Managers
 
 
 
-        public Enemy GetEnemy()
+        public Enemy GetEnemy(List<Player> targets)
         {
             var texture = _textures[Game1.Random.Next(0, _textures.Count)];
             return new Enemy(texture)
@@ -115,6 +115,7 @@ namespace UlearnGame.Managers
                 Position = new Vector2(Game1.ScreenWidth + texture.Width, Game1.Random.Next(0, Game1.ScreenHeight)),
                 Speed = 2 + (float)Game1.Random.NextDouble(),
                 ShootingTimer = 1.5f + (float)Game1.Random.NextDouble(),
+                Targets = targets,
             };
 
         }

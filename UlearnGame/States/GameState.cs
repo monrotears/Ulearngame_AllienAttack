@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using UlearnGame.Controller;
+using UlearnGame.Managers;
 using UlearnGame.Models;
 using UlearnGame.Sprites;
 
@@ -20,6 +21,7 @@ namespace UlearnGame.States
         private List<Component> _settingsComponents;
         private List<Sprite> _sprites;
         private List<Player> _players;
+        private EnemyManager _enemyManager;
         private SpriteFont _font;
         private bool _settingsOpen;
 
@@ -39,6 +41,7 @@ namespace UlearnGame.States
             var secondPlayerTexture = _content.Load<Texture2D>("pixil-frame-0");
             var bulletTexture = _content.Load<Texture2D>("Bullet");
             var buttonTexture = _content.Load<Texture2D>("Button");
+            var explosionTexture = _content.Load<Texture2D>("Explosion");
             var shootSound = _content.Load<SoundEffect>("ShootSound");
             var secondPlayerShootSound = _content.Load<SoundEffect>("ShootSoundPlayer2");
             _font = _content.Load<SpriteFont>("Font");
@@ -46,7 +49,18 @@ namespace UlearnGame.States
             _blankTexture = new Texture2D(_game.GraphicsDevice, 1, 1);
             _blankTexture.SetData(new[] { Color.White });
 
-            var playerBullet = new Bullet(bulletTexture);
+            var explosion = new Explosion(new Dictionary<string, Animation>()
+            {
+                { "Explode", new Animation(explosionTexture, 3) { FrameSpeed = 0.06f } },
+            });
+            var playerBullet = new Bullet(bulletTexture)
+            {
+                Explosion = explosion,
+            };
+            var enemyBullet = new Bullet(bulletTexture)
+            {
+                Explosion = explosion,
+            };
             CreateSettingsComponents(buttonTexture);
 
             _sprites = new List<Sprite>()
@@ -66,6 +80,10 @@ namespace UlearnGame.States
             }
 
             _players = _sprites.Where(sprite => sprite is Player).Select(sprite => (Player)sprite).ToList();
+            _enemyManager = new EnemyManager(_content)
+            {
+                Bullet = enemyBullet,
+            };
         }
 
         private void CreateSettingsComponents(Texture2D buttonTexture)
@@ -188,8 +206,18 @@ namespace UlearnGame.States
             foreach (var sprite in _sprites)
                 sprite.Update(gameTime);
 
+            _enemyManager.Update(gameTime);
+
+            if (_enemyManager.CanAdd && _sprites.Count(sprite => sprite is Enemy) < _enemyManager.MaxEnemies)
+                _sprites.Add(_enemyManager.GetEnemy(_players));
+
             AddChildSprites();
 
+            RemoveOldSprites();
+        }
+
+        private void RemoveOldSprites()
+        {
             for (int i = 0; i < _sprites.Count; i++)
             {
                 if (_sprites[i].IsRemoved)
@@ -212,7 +240,34 @@ namespace UlearnGame.States
 
         public override void PostUpdate(GameTime gameTime)
         {
-            // В первой версии пока нет врагов, стрельбы и столкновений.
+            CheckCollisions();
+            AddChildSprites();
+            RemoveOldSprites();
+        }
+
+        private void CheckCollisions()
+        {
+            for (int i = 0; i < _sprites.Count; i++)
+            {
+                var first = _sprites[i];
+
+                if (first.IsRemoved || !(first is ICollidable))
+                    continue;
+
+                for (int j = i + 1; j < _sprites.Count; j++)
+                {
+                    var second = _sprites[j];
+
+                    if (second.IsRemoved || !(second is ICollidable))
+                        continue;
+
+                    if (!first.CollisionArea.Intersects(second.CollisionArea) || !first.Intersects(second))
+                        continue;
+
+                    ((ICollidable)first).OnCollide(second);
+                    ((ICollidable)second).OnCollide(first);
+                }
+            }
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
