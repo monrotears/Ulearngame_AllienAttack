@@ -332,12 +332,6 @@ namespace UlearnGame.States
             spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.DrawString(_font, "Prototype build", new Vector2(40, 10), Color.Red);
-            spriteBatch.DrawString(_font, "WASD - движение игрока 1, Space - выстрел, Esc - выход", new Vector2(40, 35), Color.Red);
-
-            if (PlayerCount >= 2)
-                spriteBatch.DrawString(_font, "Стрелки - движение игрока 2, Right Ctrl - выстрел", new Vector2(40, 60), Color.Red);
-
             DrawHud(spriteBatch);
 
             if (_gameOver)
