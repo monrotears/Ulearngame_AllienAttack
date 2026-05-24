@@ -82,7 +82,7 @@ namespace UlearnGame.States
 
             if (PlayerCount >= 2)
             {
-                _sprites.Add(CreatePlayer(secondPlayerTexture, Color.White, new Vector2(100, 350), "Игрок 2", Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.RightControl, playerBullet, secondPlayerShootSound));
+                _sprites.Add(CreatePlayer(secondPlayerTexture, Color.White, new Vector2(100, 350), "Игрок 2", Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.Enter, playerBullet, secondPlayerShootSound));
             }
 
             _players = _sprites.Where(sprite => sprite is Player).Select(sprite => (Player)sprite).ToList();
@@ -350,7 +350,7 @@ namespace UlearnGame.States
             spriteBatch.DrawString(_font, "Игрок 1: WASD - движение, Space - стрельба", new Vector2(40, 40), Color.White);
 
             if (PlayerCount >= 2)
-                spriteBatch.DrawString(_font, "Игрок 2: стрелки - движение, Right Ctrl - стрельба", new Vector2(40, 65), Color.White);
+                spriteBatch.DrawString(_font, "Игрок 2: стрелки - движение, Enter - стрельба", new Vector2(40, 65), Color.White);
 
             var scoreY = PlayerCount >= 2 ? 92 : 67;
             spriteBatch.DrawString(_font, $"Счет: {GetTotalScore()}    Время: {(int)_survivalTime} сек.", new Vector2(40, scoreY), Color.Yellow);
